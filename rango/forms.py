@@ -1,5 +1,20 @@
 from django import forms
-from .models import Page, Category
+from django.contrib.auth.models import User
+from .models import Page, Category, UserProfile
+
+
+class UserForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput())
+
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'password')
+
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        exclude = ('user', )
 
 
 class CategoryForm(forms.ModelForm):
@@ -29,8 +44,8 @@ class PageForm(forms.ModelForm):
         cleaned_data = self.cleaned_data
         url = cleaned_data.get('url')
 
-        if url and not url.startswith('http://'):
-            url = 'http://' + url
+        if url and not url.startswith('https://'):
+            url = 'https://' + url
             cleaned_data['url'] = url
 
             return cleaned_data
