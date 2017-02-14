@@ -1,2 +1,36 @@
-{% extends 'base/base.html' %}
+{% extends 'rango/base.html' %}
 {% load staticfiles %}
+
+{% block title %} Search {% endblock %}
+
+{% block body_block %}
+<div>
+    <h1>Search with Rango</h1>
+    <br>
+    <form class="form-inline" action="{% url 'search' %}" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <input type="text" size="50" name="query" id="query" value="{{ query }}" class="form-control">
+        </div>
+        <button class="btn btn-primary" type="submit">Search</button>
+    </form>
+
+    <div>
+        {% if result_list %}
+            <h3>Results</h3>
+            <div class="list-group">
+                {% for result in result_list %}
+                    <div class="list-group-item">
+                        <h4 class="list-group-item-heading">
+                            <a href="{{ result.link }}">{{ result.title }}</a>
+                        </h4>
+                        <p class="list-group-item-text">
+                            {{ result.summary }}
+                        </p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

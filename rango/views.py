@@ -4,6 +4,7 @@ from datetime import datetime
 
 from .models import Category, Page
 from .forms import CategoryForm, PageForm
+from .bing_search5 import bing_search
 
 
 @login_required
@@ -85,6 +86,19 @@ def add_page(request, category_name_slug):
 
     context_dict = {'form': form, 'category': category}
     return render(request, 'rango/add_page.html', context_dict)
+
+
+def search(request):
+    result_list = []
+    query = ''
+
+    if request.method == 'POST':
+        query = request.POST['query'].strip()
+
+        if query:
+            result_list = bing_search(query)
+
+    return render(request, 'rango/search.html', {'result_list': result_list, 'query': query})
 
 
 def visitor_cookie_handler(request):
