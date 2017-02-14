@@ -1,15 +1,13 @@
-<ul>
+<ul class="nav nav-pills flex-column">
     {% if cats %}
         {% for category in cats %}
             {% if category == act_cat %}
-                <li>
-                    <strong>
-                        <a href="{% url 'show_category' category.slug %}">{{ category.name }}</a>
-                    </strong>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{% url 'show_category' category.slug %}">{{ category.name }}</a>
                 </li>
             {% else %}
-                <li>
-                    <a href="{% url 'show_category' category.slug %}">{{ category.name }}</a>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'show_category' category.slug %}">{{ category.name }}</a>
                 </li>
             {% endif %}
         {% endfor %}
