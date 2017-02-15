@@ -18,4 +18,7 @@ urlpatterns = [
 
     url(r'^restricted/$', views.restricted, name='restricted'),
     url(r'^search/$', views.search, name='search'),
+
+    # /rango/goto/1/
+    url(r'^goto/$', views.track_url, name='goto')
 ]
