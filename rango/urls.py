@@ -2,8 +2,8 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
-    url(r'^$', views.index, name='index'),
-    url(r'^about/', views.about, name='about'),
+    url(r'^$', views.IndexView.as_view(), name='index'),
+    url(r'^about/', views.AboutView.as_view(), name='about'),
     url(r'^add_category/$', views.add_category, name='add_category'),
 
 
@@ -20,4 +20,5 @@ urlpatterns = [
     url(r'^goto/$', views.track_url, name='goto'),
     url(r'^register_profile/$', views.user_profile_view, name='user_profile'),
     url(r'^profile/(?P<username>[\w]+)/$', views.profile, name='profile'),
+    url(r'^user_list/$', views.user_list, name='user_list'),
 ]

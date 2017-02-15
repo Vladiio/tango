@@ -9,7 +9,11 @@
         <h1 class="form-signin-heading">User profile</h1>
         <div class="row">
             <div class="col-md-4 picture">
+                {% if user_profile.picture %}
                 <img src="{{ MEDIA_URL }}{{ user_profile.picture }}" alt="profile_picture">
+                {% else %}
+                <img src="{% static 'images/default.jpg' %}" alt="Profile Photo">
+                {% endif %}
             </div>
             <div class="offset-md-1 col-md-6">
                 Username: {{ selected_user.username }}<br>
@@ -18,6 +22,7 @@
             </div>
         </div>
         <br>
+        {% if user.username == selected_user.username %}
         <h3 class="form-signin-heading">Edit</h3>
         <form action="{% url 'profile' selected_user %}"
               method="POST" enctype="multipart/form-data">
@@ -33,5 +38,6 @@
             {% endfor %}
             <button type="submit" class="btn btn-primary">Save</button>
         </form>
+        {% endif %}
     </div>
 {% endblock %}

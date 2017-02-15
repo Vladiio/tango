@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
 from django.contrib.auth.models import User
+from django.views import generic
 
 from .models import Category, Page, UserProfile
 from .forms import CategoryForm, PageForm, UserProfileForm
@@ -10,22 +11,25 @@ from .bing_search5 import bing_search
 
 # view functions
 
-def index(request):
-    category_list = Category.objects.order_by('-likes')[:5]
-    pages_list = Page.objects.order_by('-views')[:5]
-    context_dict = {
-        'categories':  category_list,
-        'pages': pages_list,
-    }
-    visitor_cookie_handler(request)
-    response = render(request, 'rango/index.html', context_dict)
-    return response
+class IndexView(generic.View):
+    template_name = 'rango/index.html'
+
+    def get(self, request):
+        context = {
+            'categories': Category.objects.order_by('-likes')[:5],
+            'pages': Page.objects.order_by('-views')[:5],
+        }
+        visitor_cookie_handler(request)
+        return render(request, self.template_name, context)
 
 
-def about(request):
-    visitor_cookie_handler(request)
-    context_dict = {'visits': request.session.get('visits')}
-    return render(request, 'rango/about.html', context_dict)
+
+class AboutView(generic.View):
+
+    def get(self, request):
+        visitor_cookie_handler(request)
+        context_dict = {'visits': request.session.get('visits')}
+        return render(request, 'rango/about.html', context_dict)
 
 
 def show_category(request, category_name_slug):
@@ -42,7 +46,7 @@ def show_category(request, category_name_slug):
 
     try:
         category = Category.objects.get(slug=category_name_slug)
-        context_dict['pages'] = Page.objects.filter(category=category)
+        context_dict['pages'] = Page.objects.filter(category=category).order_by('-views')
         context_dict['category'] = category
 
     except Category.DoesNotExist:
@@ -138,21 +142,25 @@ def profile(request, username):
         return redirect('index')
 
     user_profile = UserProfile.objects.get_or_create(user=user)[0]
-    form = UserProfileForm({'website': user_profile.website, 'picture': user_profile.picture})
+    form = UserProfileForm({'website': user_profile.website,
+                            'picture': user_profile.picture})
 
     if request.method == 'POST':
+        profile_form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
 
-        form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
+        if profile_form.is_valid():
 
-        if form.is_valid():
-            form.save(commit=True)
-            return redirect('profile', username)
-        else:
-            print(form.errors)
+            profile_form.save(commit=True)
+            return redirect('profile', user.username)
 
     return render(request, 'registration/profile.html', {'form': form,
-                                                         'selected_user': user,
-                                                         'user_profile': user_profile})
+                                                  'selected_user': user,
+                                                  'user_profile': user_profile})
+
+
+def user_list(request):
+    users = User.objects.all()
+    return render(request, 'rango/user_list.html', {'users': users})
 
 # helper functions
 
