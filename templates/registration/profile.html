@@ -1,0 +1,37 @@
+{% extends 'rango/base.html' %}
+{% load staticfiles %}
+
+
+{% block title %}User profile {% endblock %}
+
+{% block body_block %}
+    <div class="offset-md-2 col-md-6">
+        <h1 class="form-signin-heading">User profile</h1>
+        <div class="row">
+            <div class="col-md-4 picture">
+                <img src="{{ MEDIA_URL }}{{ user_profile.picture }}" alt="profile_picture">
+            </div>
+            <div class="offset-md-1 col-md-6">
+                Username: {{ selected_user.username }}<br>
+                E-mail: {{ selected_user.email }}<br>
+                Web-site: <a href="{{ user_profile.website }}">{{ user_profile.website }}</a>
+            </div>
+        </div>
+        <br>
+        <h3 class="form-signin-heading">Edit</h3>
+        <form action="{% url 'profile' selected_user %}"
+              method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group">
+                {% if field.errors %}
+                    {{ field.errors }}
+                {% endif %}
+                {{ field.label_tag }}
+                {{ field }}
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+    </div>
+{% endblock %}

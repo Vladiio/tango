@@ -16,9 +16,8 @@ urlpatterns = [
         views.add_page,
         name='add_page'),
 
-    url(r'^restricted/$', views.restricted, name='restricted'),
-    url(r'^search/$', views.search, name='search'),
-
     # /rango/goto/1/
-    url(r'^goto/$', views.track_url, name='goto')
+    url(r'^goto/$', views.track_url, name='goto'),
+    url(r'^register_profile/$', views.user_profile_view, name='user_profile'),
+    url(r'^profile/(?P<username>[\w]+)/$', views.profile, name='profile'),
 ]

@@ -7,37 +7,7 @@
     <h1 class="form-signin-heading">Register here</h1>
     <form action="." method="post">
         {% csrf_token %}
-        <div class="form-group col-md-8">
-            <p class="required">
-            <label class="required" for="id_username">Username</label>
-            <input type="text" name="username" id="id_username"
-                   class="form-control" maxlength="30">
-            <span class="helptext">
-                Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only
-            </span>
-            </p>
-
-            <p class="required">
-            <label class="required" for="id_email">E-mail</label>
-            <input type="email" name="email" id="id_email"
-                   class="form-control">
-            </p>
-            
-            <p class="required">
-                <label for="id_password1" class="required">Password</label>
-                <input type="password" name="password2" id="id_password1"
-                       class="form-control">
-            </p>
-            
-            <p class="required">
-                <label for="id_password2" class="required">Password confirmation</label>
-                <input type="password" name="password2" id="id_password2"
-                       class="form-control">
-                <span class="helptext">
-                    Enter the same password as before, for verification.
-                </span>
-            </p>
-        </div>
+        {{ form|as_bootstrap }}
         <button class="btn btn-primary">Register</button>
     </form>
 </div>
