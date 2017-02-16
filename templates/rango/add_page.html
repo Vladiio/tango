@@ -7,7 +7,7 @@
         {% if category %}
         <form role="form" action="." id="page_form" method="post">
             <h2 class="form-signin-heading">Add a Page to
-                <a href="{% url 'add_page' category.slug %}">{{ category.name }}</a>
+                <a href="{% url 'show_category' category.slug %}">{{ category.name }}</a>
             </h2>
             {% csrf_token %}
             {% for hidden in form.hidden_fields %}

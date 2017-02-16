@@ -27,7 +27,7 @@
 
     <h3>Search with Rango</h3>
     <br>
-    <form action="{% url 'show_category' category.slug %}" method="post" class="form-inline">
+    <form action="{% url 'show_category' category.slug %}" method="get" class="form-inline">
         {% csrf_token %}
         <div class="form-group">
             <input class="form-control" type="text" value="{{ query }}"

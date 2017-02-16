@@ -1,15 +1,17 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 from datetime import datetime
 from django.contrib.auth.models import User
 from django.views import generic
+from django.views.generic.edit import FormView
 
 from .models import Category, Page, UserProfile
 from .forms import CategoryForm, PageForm, UserProfileForm
 from .bing_search5 import bing_search
 
 
-# view functions
+# views
 
 class IndexView(generic.View):
     template_name = 'rango/index.html'
@@ -23,7 +25,6 @@ class IndexView(generic.View):
         return render(request, self.template_name, context)
 
 
-
 class AboutView(generic.View):
 
     def get(self, request):
@@ -32,76 +33,59 @@ class AboutView(generic.View):
         return render(request, 'rango/about.html', context_dict)
 
 
-def show_category(request, category_name_slug):
-    context_dict = {}
-    query = ''
-    result_list = []
+class CategoryView(generic.ListView):
+    template_name = 'rango/category.html'
+    context_object_name = 'category'
 
-    if request.method == "POST":
+    def get_queryset(self):
+        self.category = get_object_or_404(Category, slug=self.kwargs['slug'])
+        return self.category
 
-        query = request.POST['query']
-        result_list = bing_search(query)
-        context_dict['result_list'] = result_list
-        context_dict['query'] = query
-
-    try:
-        category = Category.objects.get(slug=category_name_slug)
-        context_dict['pages'] = Page.objects.filter(category=category).order_by('-views')
-        context_dict['category'] = category
-
-    except Category.DoesNotExist:
-        context_dict['category'] = None
-        context_dict['pages'] = None
-
-    return render(request, 'rango/category.html', context_dict)
+    def get_context_data(self, **kwargs):
+        context = super(CategoryView, self).get_context_data(**kwargs)
+        context['pages'] = Page.objects.filter(category=self.category)
+        self.query = self.request.GET.get('query', '')
+        context['result_list'] = bing_search(self.query)
+        return context
 
 
-@login_required
-def add_category(request):
-    form = CategoryForm()
+@method_decorator(login_required, name='dispatch')
+class AddCategoryView(FormView):
+    template_name = 'rango/add_category.html'
+    form_class = CategoryForm
+    success_url = '/rango/'
 
-    if request.method == 'POST':
-        form = CategoryForm(request.POST)
-
-        if form.is_valid():
-
-            form.save(commit=True)
-            return index(request)
-        else:
-            print(form.errors)
-
-    return render(request, 'rango/add_category.html', {'form': form})
+    def form_valid(self, form):
+        form.save(commit=True)
+        return super(AddCategoryView, self).form_valid(form)
 
 
-@login_required
-def add_page(request, category_name_slug):
-    try:
-        category = Category.objects.get(slug=category_name_slug)
-    except Category.DoesNotExist:
-        category = None
+@method_decorator(login_required, name='dispatch')
+class AddPageView(FormView):
+    template_name = 'rango/add_page.html'
+    form_class = PageForm
+    success_url = '/rango/category/'
 
-    form = PageForm()
-    if request.method == 'POST':
+    def get_context_data(self, **kwargs):
+        context = super(AddPageView, self).get_context_data(**kwargs)
+        slug = self.kwargs['category_name_slug']
+        self.category = Category.objects.get(slug=slug)
+        context['category'] = self.category
+        return context
 
-        form = PageForm(request.POST)
-        if form.is_valid():
-
-            if category:
-
-                page = form.save(commit=False)
-                page.category = category
-                page.save()
-                return index(request)
-        else:
-            print(form.errors)
-
-    context_dict = {'form': form, 'category': category}
-    return render(request, 'rango/add_page.html', context_dict)
+    def form_valid(self, form):
+        slug = self.kwargs['category_name_slug']
+        self.category = Category.objects.get(slug=slug)
+        page = form.save(commit=False)
+        page.category = self.category
+        page.save()
+        self.success_url += slug
+        return super(AddPageView, self).form_valid(form)
 
 
-def track_url(request):
-    """ Increments views and redirect to page"""
-    if request.method == "GET":
+class TrackUrl(generic.View):
+
+    def get(self, request):
 
         if 'page_id' in request.GET:
 
@@ -114,23 +98,19 @@ def track_url(request):
         return redirect('index')
 
 
-@login_required
-def user_profile_view(request):
-    form = UserProfileForm()
-    if request.user:
-        return redirect('index')
+@method_decorator(login_required, name='dispatch')
+class CreateUserProfile(FormView):
+    form_class = UserProfileForm
+    template_name = 'registration/profile_registration.html'
+    success_url = '/rango/profile/'
 
-    if request.method == 'POST':
+    def form_valid(self, form):
 
-        form = UserProfileForm(request.POST, request.FILES)
-
-        if form.is_valid():
-            user_profile = form.save(commit=False)
-            user_profile.user = request.user
-            user_profile.save()
-            return redirect('index')
-
-    return render(request, 'registration/profile_registration.html', {'form': form})
+        user_profile = form.save(commit=False)
+        user_profile.user = self.request.user
+        user_profile.save()
+        self.success_url += user_profile.user.username
+        return super(CreateUserProfile, self).form_valid(form)
 
 
 @login_required
@@ -158,9 +138,12 @@ def profile(request, username):
                                                   'user_profile': user_profile})
 
 
-def user_list(request):
-    users = User.objects.all()
-    return render(request, 'rango/user_list.html', {'users': users})
+class UserListView(generic.ListView):
+    template_name = 'rango/user_list.html'
+    context_object_name = 'users'
+
+    def get_queryset(self):
+        return User.objects.all()
 
 # helper functions
 
