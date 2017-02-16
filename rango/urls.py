@@ -25,6 +25,9 @@ urlpatterns = [
         views.CreateUserProfile.as_view(),
         name='user_profile'),
 
-    url(r'^profile/(?P<username>[\w]+)/$', views.profile, name='profile'),
+    url(r'^profile/(?P<username>[\w]+)/$',
+        views.profile,
+        name='profile'),
+
     url(r'^user_list/$', views.UserListView.as_view(), name='user_list'),
 ]

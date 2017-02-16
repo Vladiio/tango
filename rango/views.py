@@ -4,7 +4,7 @@ from django.utils.decorators import method_decorator
 from datetime import datetime
 from django.contrib.auth.models import User
 from django.views import generic
-from django.views.generic.edit import FormView
+from django.views.generic.edit import FormView, UpdateView
 
 from .models import Category, Page, UserProfile
 from .forms import CategoryForm, PageForm, UserProfileForm
@@ -125,7 +125,7 @@ def profile(request, username):
     form = UserProfileForm({'website': user_profile.website,
                             'picture': user_profile.picture})
 
-    if request.method == 'POST':
+    if request.method == 'POST' and request.user.username == username:
         profile_form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
 
         if profile_form.is_valid():

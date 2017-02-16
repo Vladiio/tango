@@ -1,0 +1,24 @@
+{% extends 'rango/base.html' %}
+{% load staticfiles %}
+
+
+{% block title %}User profile {% endblock %}
+
+{% block body_block %}
+
+<form action="{% url 'profile' selected_user %}"
+      method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% for field in form %}
+        <div class="form-group">
+            {% if field.errors %}
+            {{ field.errors }}
+            {% endif %}
+            {{ field.label_tag }}
+            {{ field }}
+        </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+{% endblock %}
