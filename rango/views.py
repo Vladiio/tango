@@ -4,7 +4,8 @@ from django.utils.decorators import method_decorator
 from datetime import datetime
 from django.contrib.auth.models import User
 from django.views import generic
-from django.views.generic.edit import FormView, UpdateView
+from django.views.generic.edit import FormView
+from django.http import HttpResponse
 
 from .models import Category, Page, UserProfile
 from .forms import CategoryForm, PageForm, UserProfileForm
@@ -145,7 +146,72 @@ class UserListView(generic.ListView):
     def get_queryset(self):
         return User.objects.all()
 
+
+@method_decorator(login_required, name='dispatch')
+class CategoryAddLike(generic.View):
+
+    def get(self, request):
+        category_id = request.GET.get('category_id')
+
+        if category_id :
+            category = Category.objects.get(id=int(category_id))
+
+            if category_id not in request.session:
+                category.likes += 1
+                request.session[category_id] = True
+
+            else:
+                category.likes -= 1
+                del request.session[category_id]
+
+            category.save()
+            return HttpResponse(category.likes)
+
+
+class SuggestionView(generic.View):
+
+    def get(self, request):
+        query = request.GET.get('query')
+        category_list = []
+
+        if query:
+            category_list = get_suggestion_list(query, 8)
+
+        return render(request, 'rango/cats.html', {'cats': category_list})
+
+
+@method_decorator(login_required, name='dispatch')
+class AutoAddPage(generic.View):
+
+    def get(self, request):
+        category_id = request.GET.get('category_id')
+        url = request.GET.get('url')
+        title = request.GET.get('title')
+
+        category = Category.objects.get(id=category_id)
+        if category:
+
+            page = Page.objects.get_or_create(category=category,
+                                              title=title,
+                                              url=url)[0]
+
+        pages = Page.objects.filter(category=category)
+
+        return render(request, 'rango/pages_list.html', {'pages': pages,
+                                                         'category': category})
+
+
+
 # helper functions
+
+
+def get_suggestion_list(query='', max_results=0):
+    category_list = Category.objects.filter(name__istartswith=query)
+
+    if max_results > 0:
+        category_list = category_list[:max_results]
+
+    return category_list
 
 def visitor_cookie_handler(request):
     """ Process session last visit and visits counter

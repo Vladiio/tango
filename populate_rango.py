@@ -74,10 +74,71 @@ def populate():
         }
      ]
 
+    pascal_pages = [
+        {
+            "title":"Lessons",
+            "url":"http://learnpascal.ru/",
+
+        },
+
+        {
+            "title":"lurkmore",
+            "url":"http://lurkmore.to/Pascal",
+
+        }
+    ]
+
+    perl_pages = [
+        {
+            "title":"Wiki",
+            "url":"https://ru.wikipedia.org/wiki/Perl",
+
+        },
+
+        {
+            "title":"Official",
+            "url":"https://www.perl.org/",
+
+        }
+    ]
+
+    php_pages = [
+        {
+            "title":"Wiki",
+            "url":"https://ru.wikipedia.org/wiki/PHP",
+
+        },
+
+        {
+            "title":"Habr",
+            "url":"https://habrahabr.ru/hub/php/",
+
+        }
+    ]
+
+    prolog_pages = [
+        {
+            "title":"Lurkmore",
+            "url":"lurkmore.to/Prolog",
+
+        },
+
+        {
+            "title":"Habr",
+            "url":"https://habrahabr.ru/post/124636/",
+
+        }
+    ]
+
     cats = {
         ("Python", VIEWS, LIKES): {"pages": python_pages},
         ("Django", VIEWS//2, LIKES//2): {"pages": django_pages},
-        ("Other Frameworks", VIEWS//4, LIKES//4): {"pages": other_pages}
+        ("Other Frameworks", VIEWS//4, LIKES//4): {"pages": other_pages},
+        ("Pascal", VIEWS, LIKES): {"pages": pascal_pages},
+        ("Perl", VIEWS//2, LIKES//4): {"pages": perl_pages},
+        ("PHP", VIEWS // 2, LIKES // 2): {"pages": php_pages},
+        ("Prolog", VIEWS // 4, LIKES // 4): {"pages": prolog_pages},
+
      }
 
      # If you want to add more catergories or pages,
