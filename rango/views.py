@@ -138,7 +138,7 @@ def profile(request, username):
                                                   'selected_user': user,
                                                   'user_profile': user_profile})
 
-
+@method_decorator(login_required, name='dispatch')
 class UserListView(generic.ListView):
     template_name = 'rango/user_list.html'
     context_object_name = 'users'

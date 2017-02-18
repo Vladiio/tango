@@ -5,11 +5,14 @@
 {% block title %}Users {% endblock %}
 
 {% block body_block %}
-    <ul class="list-group">
-    {% for user in users %}
-        <li class="list-group-item">
-            <a href="{% url 'profile' user.username %}">{{ user.username }}</a>
-        </li>
-    {% endfor %}
-    </ul>
+    <div class="offset-sm-3 col-sm-6">
+        <h3>All users list</h3>
+        <ul class="list-group">
+        {% for user in users %}
+            <li class="list-group-item">
+                <a href="{% url 'profile' user.username %}">{{ user.username }}</a>
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
 {% endblock %}
