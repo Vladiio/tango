@@ -4,6 +4,7 @@ from .models import Page, Category, UserProfile
 
 class PageAdmin(admin.ModelAdmin):
     list_display = ['title', 'category', 'url']
+    exclude = ('first_visit', 'last_visit', 'views')
 
 
 class CategoryAdmin(admin.ModelAdmin):

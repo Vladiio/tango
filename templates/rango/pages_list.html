@@ -5,9 +5,9 @@
                                 <li><a href="{% url 'goto' %}?page_id={{ page.id }}">{{ page }}</a></li>
                         {% endfor %}
 
-                        <!--{% if user.is_authenticated %}
+                        {% if user.is_authenticated %}
                             <li><a href="{% url 'add_page' category.slug %}">Add a Page</a></li>
-                        {% endif %}-->
+                        {% endif %}
                     </ul>
                 {% else %}
                     <strong>No pages currently in category</strong>

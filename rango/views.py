@@ -93,6 +93,9 @@ class TrackUrl(generic.View):
             page_id = request.GET['page_id']
             page = Page.objects.get(id=page_id)
             page.views += 1
+            if not page.first_visit:
+                page.first_visit = datetime.now()
+            page.last_visit = datetime.now()
             page.save()
             return redirect(page.url)
 
