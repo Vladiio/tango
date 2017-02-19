@@ -43,14 +43,15 @@ class Page(models.Model):
     def save(self, *args, **kwargs):
         now = timezone.now()
 
-        if self.first_visit > now:
-            self.first_visit = now
+        if self.first_visit:
+            if self.first_visit > now:
+                 self.first_visit = now
 
-        if self.last_visit > now:
-            self.last_visit = now
+            if self.last_visit > now:
+                self.last_visit = now
 
-        if self.last_visit < self.first_visit:
-            self.last_visit = self.first_visit
+            if self.last_visit < self.first_visit:
+                self.last_visit = self.first_visit
 
         super(Page, self).save(*args, **kwargs)
 

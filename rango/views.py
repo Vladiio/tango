@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from datetime import datetime
 from django.contrib.auth.models import User
 from django.views import generic
 from django.views.generic.edit import FormView
 from django.http import HttpResponse
+from django.utils import timezone
+from datetime import datetime
 
 from .models import Category, Page, UserProfile
 from .forms import CategoryForm, PageForm, UserProfileForm
@@ -46,7 +47,9 @@ class CategoryView(generic.ListView):
         context = super(CategoryView, self).get_context_data(**kwargs)
         context['pages'] = Page.objects.filter(category=self.category)
         self.query = self.request.GET.get('query', '')
-        context['result_list'] = bing_search(self.query)
+        if self.query:
+            context['result_list'] = bing_search(self.query)
+            context['query'] = self.query
         return context
 
 
@@ -94,8 +97,8 @@ class TrackUrl(generic.View):
             page = Page.objects.get(id=page_id)
             page.views += 1
             if not page.first_visit:
-                page.first_visit = datetime.now()
-            page.last_visit = datetime.now()
+                page.first_visit = timezone.now()
+            page.last_visit = timezone.now()
             page.save()
             return redirect(page.url)
 
